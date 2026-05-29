@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sodi Daara | Premium Handcrafted Crochet Creations</title>
+    <meta name="description" content="Discover exquisite, hand-knitted and crocheted plushies, wearables, and home decor. Customize your own amigurumi plushies, beanies, and bags online.">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <!-- Supabase JS Client SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <!-- Inline styles before full stylesheet load to prevent flash -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Toast Notification Container -->
+    <div class="cozy-toast-container" id="cozy-toast-container"></div>
+
+    <!-- Top Alert Bar -->
+    <div class="top-bar">
+        <span class="top-bar-text">✨ Standard Cozy Shipping ₹199 or FREE on Orders Over ₹2,999! ✨</span>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header" id="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">🧶</span>
+                <span class="logo-text">Sodi Daara</span>
+            </div>
+            <nav class="nav-menu" id="nav-menu">
+                <a href="#hero" class="nav-link active">Home</a>
+                <a href="#shop" class="nav-link">Shop</a>
+                <a href="#customizer" class="nav-link">Customizer</a>
+                <a href="#story" class="nav-link">Our Story</a>
+                <a href="#custom-order" class="nav-link">Custom Inquiry</a>
+                <a href="#" id="header-track-order-link" class="nav-link">Track Order 📦</a>
+            </nav>
+            <div class="header-actions">
+                <button class="icon-btn search-trigger" id="search-trigger" aria-label="Search items">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+                <button class="profile-trigger icon-btn" id="profile-trigger" aria-label="Customer Profile">👤</button>
+                <button class="cart-trigger icon-btn" id="cart-trigger" aria-label="Shopping cart">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    <span class="cart-badge" id="cart-badge">0</span>
+                </button>
+                <button class="menu-toggle icon-btn" id="menu-toggle" aria-label="Toggle menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="search-overlay">
+        <div class="search-container">
+            <input type="text" class="search-input" id="search-input" placeholder="Search for plushies, sweaters, patterns...">
+            <button class="close-search-btn" id="close-search">&times;</button>
+        </div>
+    </div>
+
+    <!-- Sliding Sidebar Shopping Cart -->
+    <div class="cart-overlay" id="cart-overlay"></div>
+    <aside class="cart-sidebar" id="cart-sidebar" aria-modal="true" role="dialog">
+        <div class="cart-header">
+            <h3 class="cart-title">Your Basket</h3>
+            <button class="close-cart-btn" id="close-cart" aria-label="Close cart">&times;</button>
+        </div>
+        <div class="cart-items-container" id="cart-items-container">
+            <!-- Dynamic Items Here -->
+            <div class="empty-cart-state" id="empty-cart-state">
+                <div class="empty-cart-icon">🧶</div>
+                <p class="empty-cart-message">Your basket is currently empty.</p>
+                <a href="#shop" class="btn primary-btn fill-btn close-cart-link">Browse Shop</a>
+            </div>
+        </div>
+        <div class="cart-footer" id="cart-footer" style="display: none;">
+            <div class="cart-total-row">
+                <span>Subtotal</span>
+                <span class="cart-total-price" id="cart-subtotal">₹0</span>
+            </div>
+            <div class="cart-total-row shipping-row">
+                <span>Shipping</span>
+                <span class="cart-shipping-price" id="cart-shipping">Free</span>
+            </div>
+            <hr class="cart-divider">
+            <div class="cart-total-row grand-total-row">
+                <span>Total</span>
+                <span class="cart-grand-total" id="cart-total">₹0</span>
+            </div>
+            <button class="btn primary-btn checkout-btn" id="checkout-btn">Proceed to Checkout</button>
+        </div>
+    </aside>
+
+    <!-- Simulated Checkout Modal -->
+    <div class="modal-overlay" id="checkout-modal-overlay">
+        <div class="checkout-modal" id="checkout-modal">
+            <button class="close-modal-btn" id="close-checkout-modal">&times;</button>
+            <div class="checkout-wizard" id="checkout-wizard">
+                <!-- Step 1: Info -->
+                <div class="wizard-step active" id="wizard-step-1">
+                    <h3 class="modal-title">Shipping Information</h3>
+                    <form class="checkout-form" id="shipping-form" onsubmit="event.preventDefault();">
+                        <div class="form-row two-cols">
+                            <div class="form-group">
+                                <label for="checkout-first-name">First Name</label>
+                                <input type="text" id="checkout-first-name" required placeholder="Jane">
+                            </div>
+                            <div class="form-group">
+                                <label for="checkout-last-name">Last Name</label>
+                                <input type="text" id="checkout-last-name" required placeholder="Doe">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkout-email">Email Address</label>
+                            <input type="email" id="checkout-email" required placeholder="jane.doe@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="checkout-phone">Phone Number (10-Digit Mobile)</label>
+                            <input type="tel" id="checkout-phone" required placeholder="9876543210" pattern="[6-9][0-9]{9}">
+                        </div>
+                        <div class="form-group">
+                            <label for="checkout-address">Delivery Address</label>
+                            <input type="text" id="checkout-address" required placeholder="123 Yarn Street">
+                        </div>
+                        <div class="form-row two-cols">
+                            <div class="form-group">
+                                <label for="checkout-city">City</label>
+                                <input type="text" id="checkout-city" required placeholder="Crochet City">
+                            </div>
+                            <div class="form-group">
+                                <label for="checkout-zip">Zip Code</label>
+                                <input type="text" id="checkout-zip" required placeholder="12345">
+                            </div>
+                        </div>
+                        <div class="wizard-actions">
+                            <button type="submit" class="btn primary-btn wizard-next-btn" id="to-payment-btn">Next: Payment Details</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Step 2: Payment -->
+                <div class="wizard-step" id="wizard-step-2">
+                    <h3 class="modal-title">Secure Payment</h3>
+                    <form class="checkout-form" id="payment-form" onsubmit="event.preventDefault();">
+                        <div class="form-group">
+                            <label for="card-name">Name on Card</label>
+                            <input type="text" id="card-name" required placeholder="Jane Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="card-number">Card Number</label>
+                            <input type="text" id="card-number" required placeholder="4111 2222 3333 4444" maxlength="19">
+                        </div>
+                        <div class="form-row two-cols">
+                            <div class="form-group">
+                                <label for="card-expiry">Expiry Date</label>
+                                <input type="text" id="card-expiry" required placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="card-cvc">CVC Code</label>
+                                <input type="text" id="card-cvc" required placeholder="123" maxlength="4">
+                            </div>
+                        </div>
+                        <div class="wizard-actions">
+                            <button type="button" class="btn secondary-btn wizard-prev-btn" id="back-to-shipping-btn">Back</button>
+                            <button type="submit" class="btn primary-btn" id="place-order-btn">Place Order (₹<span id="final-checkout-amount">0</span>)</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Step 3: Success -->
+                <div class="wizard-step success-step" id="wizard-step-3">
+                    <div class="success-animation-container">
+                        <div class="success-yarn-ball">🧸🧶</div>
+                    </div>
+                    <h3 class="modal-title success-title">Order Confirmed!</h3>
+                    <p class="success-message">Thank you for supporting our slow craft shop! Your beautiful handmade treasures are being prepped with love. We've sent a detailed receipt to <strong id="success-email-display">jane.doe@example.com</strong>.</p>
+                    
+                    <!-- Simulated HTML Email Receipt Slider -->
+                    <div class="email-slider-container" id="email-receipt-slider">
+                        <div class="email-slider-header">
+                            <span>📧</span>
+                            <strong>Sodi Daara Store &lt;hello@sodidaara.com&gt;</strong>
+                        </div>
+                        <div class="email-slider-body">
+                            <div style="text-align: center; margin-bottom: 12px;">
+                                <span style="font-size: 1.8rem;">💌</span>
+                                <h4 style="margin: 4px 0 0 0; font-family: var(--font-heading); color: var(--color-primary);">Your Crochet Journey Begins!</h4>
+                            </div>
+                            <p>Hi <strong id="email-recipient-name">Jane</strong>,</p>
+                            <p>We are absolutely thrilled to begin knitting your handmade order! Here is a copy of your artisan receipt:</p>
+                            <table class="email-invoice-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th style="text-align: right;">Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="email-invoice-items">
+                                    <!-- Dynamic items -->
+                                </tbody>
+                            </table>
+                            <div style="text-align: right; font-weight: 700; margin-top: 10px; color: var(--color-primary);">
+                                Grand Total Paid: <span id="email-total-amount">₹0</span>
+                            </div>
+                            <hr style="border: none; border-top: 1px dashed var(--color-bg-alt); margin: 15px 0;">
+                            <p style="font-size: 0.75rem; color: var(--color-text-light); text-align: center; line-height: 1.4;">
+                                You can track the real-time crochet timeline using your tracking ID in our Loop Assistant chatbot or tracking portal!
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(44, 37, 32, 0.05); padding: 16px; border-radius: var(--radius-md); margin: 20px 0; border: 1px dashed var(--color-primary); display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <span style="font-size: 0.8rem; color: var(--color-text-light); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Your Order Tracking ID</span>
+                        <h4 style="font-family: monospace; font-size: 1.6rem; color: var(--color-primary); margin: 4px 0;" id="success-order-id">#LL-0000</h4>
+                        <button class="btn secondary-btn" id="success-track-btn" style="padding: 8px 16px; font-size: 0.85rem; margin-top: 6px; border-width: 1.5px;">Track Status Live 🔍</button>
+                    </div>
+                    
+                    <button class="btn primary-btn close-success-modal-btn" id="finish-checkout-btn">Continue Shopping</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Tracking Modal Overlay -->
+    <div class="modal-overlay" id="order-tracking-modal-overlay">
+        <div class="checkout-modal" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
+            <button class="close-modal-btn" id="close-tracking-modal-btn">&times;</button>
+            <h3 class="modal-title" style="margin-bottom: 8px;">Track Handmade Order</h3>
+            <p style="color: var(--color-text-light); font-size: 0.9rem; text-align: center; margin-bottom: 24px;">Enter your Order ID to check the real-time crafting and shipping progress of your slow-craft treasure.</p>
+            
+            <div class="form-group" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="tracking-search-input" placeholder="e.g. LL-4829" style="flex-grow: 1; text-transform: uppercase; padding: 12px 16px; border-radius: var(--radius-md); border: 2px solid var(--color-bg-alt);">
+                <button class="btn primary-btn" id="tracking-search-btn" style="padding: 12px 20px; border-radius: var(--radius-md);">Search</button>
+            </div>
+            
+            <!-- Recent Orders List (Dynamic) -->
+            <div id="tracking-recent-orders-section" style="margin-bottom: 24px; display: none;">
+                <h4 style="font-family: var(--font-body); font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; color: var(--color-text); display: flex; align-items: center; gap: 6px;">📦 Your Recent Orders</h4>
+                <div id="tracking-recent-orders-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 180px; overflow-y: auto; padding-right: 4px;">
+                    <!-- Dynamically populated order list items -->
+                </div>
+            </div>
+            
+            <!-- Dynamic Results Area -->
+            <div id="tracking-results-area" style="display: none;">
+                <!-- Status Timeline -->
+                <div class="tracking-timeline" style="margin: 28px 0; position: relative; display: flex; justify-content: space-between; align-items: center;">
+                    <div class="timeline-progress-line" style="position: absolute; top: 18px; left: 10px; right: 10px; height: 4px; background: var(--color-bg-alt); z-index: 1;">
+                        <div id="tracking-progress-fill" style="width: 0%; height: 100%; background: var(--color-primary); transition: var(--transition-smooth);"></div>
+                    </div>
+                    
+                    <div class="timeline-step" id="step-pending" style="z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                        <div class="step-icon-dot" style="width: 40px; height: 40px; border-radius: 50%; background: var(--color-bg-alt); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 2px solid var(--color-white); box-shadow: var(--shadow-sm); transition: var(--transition-smooth);">📝</div>
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-light);">Pending</span>
+                    </div>
+                    <div class="timeline-step" id="step-processing" style="z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                        <div class="step-icon-dot" style="width: 40px; height: 40px; border-radius: 50%; background: var(--color-bg-alt); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 2px solid var(--color-white); box-shadow: var(--shadow-sm); transition: var(--transition-smooth);">🧶</div>
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-light);">Knit/Craft</span>
+                    </div>
+                    <div class="timeline-step" id="step-shipped" style="z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                        <div class="step-icon-dot" style="width: 40px; height: 40px; border-radius: 50%; background: var(--color-bg-alt); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 2px solid var(--color-white); box-shadow: var(--shadow-sm); transition: var(--transition-smooth);">📦</div>
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-light);">Shipped</span>
+                    </div>
+                    <div class="timeline-step" id="step-completed" style="z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                        <div class="step-icon-dot" style="width: 40px; height: 40px; border-radius: 50%; background: var(--color-bg-alt); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 2px solid var(--color-white); box-shadow: var(--shadow-sm); transition: var(--transition-smooth);">💖</div>
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-light);">Arrived</span>
+                    </div>
+                </div>
+                
+                <div id="tracking-status-banner" style="background: var(--color-highlight); padding: 12px; border-radius: var(--radius-sm); text-align: center; font-weight: 700; color: var(--color-primary); border: 1px dashed var(--color-secondary); margin-bottom: 20px;">
+                    Status: Pending
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn secondary-btn print-invoice-btn" id="print-invoice-btn" style="flex: 1; padding: 10px; font-size: 0.85rem;">🖨️ Print Invoice</button>
+                </div>
+                
+                <!-- Receipt Breakdown -->
+                <div style="background: var(--color-white); border-radius: var(--radius-md); padding: 18px; border: 1px solid rgba(44, 37, 32, 0.04); box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(44, 37, 32, 0.08); padding-bottom: 10px; margin-bottom: 12px; font-size: 0.9rem;">
+                        <span style="color: var(--color-text-light);">Recipient Name:</span>
+                        <strong id="tracking-customer-name">Jane Doe</strong>
+                    </div>
+                    <div id="tracking-items-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 12px; padding-right: 5px;">
+                        <!-- Dynamic items list -->
+                    </div>
+                    <div style="border-top: 1px solid var(--color-bg-alt); padding-top: 10px; font-size: 0.95rem; display: flex; justify-content: space-between;">
+                        <span style="color: var(--color-text-light);">Grand Total:</span>
+                        <strong id="tracking-total-amount" style="color: var(--color-primary); font-size: 1.1rem;">₹0</strong>
+                    </div>
+                </div>
+
+                <!-- Chronological Audit Trail -->
+                <div id="tracking-history-trail" class="audit-log-section">
+                    <h4 class="audit-log-title">⏱️ Crafting & Shipping Timeline</h4>
+                    <div class="audit-timeline" id="tracking-audit-timeline">
+                        <!-- Dynamic chronological entries will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Hidden Printable Invoice Sheet -->
+                <div id="printable-invoice-content" style="display: none; padding: 20px; font-family: var(--font-body); color: #000;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h2 style="font-family: var(--font-heading); margin: 0; color: var(--color-primary);">Sodi Daara</h2>
+                        <p style="font-size: 0.85rem; margin: 4px 0;">Premium Handcrafted Crochet Storefront</p>
+                        <p style="font-size: 0.75rem; margin: 2px 0;">123 Yarn Street, Cozy City</p>
+                    </div>
+                    <hr style="border: none; border-top: 1px dashed #000; margin: 15px 0;">
+                    <h3 style="margin-top: 0;">INVOICE / RECEIPT</h3>
+                    <p><strong>Order ID:</strong> <span id="print-order-id">#LL-0000</span></p>
+                    <p><strong>Date:</strong> <span id="print-order-date">2026-05-20</span></p>
+                    <p><strong>Customer:</strong> <span id="print-customer-name">Jane Doe</span> (<span id="print-customer-email">jane@example.com</span>)</p>
+                    <p><strong>Delivery Address:</strong> <span id="print-customer-address">123 Yarn Street, Crochet City, 12345</span></p>
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #000;">
+                                <th style="text-align: left; padding: 8px 0;">Item Description</th>
+                                <th style="text-align: right; padding: 8px 0;">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="print-invoice-items">
+                            <!-- Dynamic items injected here -->
+                        </tbody>
+                    </table>
+                    <div style="text-align: right; font-size: 1.1rem; font-weight: 700; margin-top: 15px;">
+                        Total Paid: <span id="print-total-amount">₹0</span>
+                    </div>
+                    <hr style="border: none; border-top: 1px dashed #000; margin: 20px 0;">
+                    <div style="text-align: center; font-size: 0.8rem; font-style: italic;">
+                        Thank you for supporting slow craftsmanship! 💖
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tracking-error-msg" style="display: none; text-align: center; color: var(--color-primary); font-weight: 700; margin: 24px 0; background: rgba(214, 94, 66, 0.08); padding: 12px; border-radius: var(--radius-sm); border: 1px solid rgba(214, 94, 66, 0.2);">
+                ⚠️ We couldn't find an order with that tracking ID. Please check the spelling and try again!
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main>
+        <!-- Dynamic Product Catalog -->
+        <section class="shop-section" id="shop">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="sub-heading">Curated Collection</span>
+                    <h2 class="section-title">Explore the Woolly Wonders</h2>
+                    <p class="section-desc">Each item is knitted by hand with high-quality, eco-friendly cotton and chenille wool. Find your perfect snuggle companion or cozy fit.</p>
+                </div>
+
+                <!-- Filters & Search Bar -->
+                <div class="filter-controls">
+                    <div class="category-tabs" id="category-tabs">
+                        <button class="tab-btn active" data-category="all">All Items</button>
+                        <button class="tab-btn" data-category="plushies">Plushies</button>
+                        <button class="tab-btn" data-category="wearables">Wearables</button>
+                        <button class="tab-btn" data-category="decor">Home Decor</button>
+                    </div>
+                    <div class="catalog-search">
+                        <input type="text" class="catalog-search-input" id="catalog-search" placeholder="Quick search catalog...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="products-grid" id="products-grid">
+                    <!-- Dynamic Products Generated by app.js -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Crochet Customizer Section -->
+        <section class="customizer-section" id="customizer">
+            <div class="customizer-bg-texture"></div>
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="sub-heading">Design Lab</span>
+                    <h2 class="section-title">Create Your Own Masterpiece</h2>
+                    <p class="section-desc">Choose an amigurumi base, select custom wool textures, and paint it loop-by-loop. Our knitters will craft your custom choice exactly as designed!</p>
+                </div>
+
+                <div class="customizer-grid">
+                    <!-- Interactive Visualizer -->
+                    <div class="customizer-preview-container">
+                        <div class="yarn-material-effect" id="yarn-material-effect"></div>
+                        <div class="customizer-preview" id="customizer-preview">
+                            <!-- Dynamic SVG items loaded here -->
+                            <svg id="customizer-svg" viewBox="0 0 400 400" width="100%" height="100%">
+                                <!-- Dynamic layers (Outline, primaryColor, secondaryColor, faceDetails) -->
+                            </svg>
+                        </div>
+                        <div class="customizer-status">
+                            <span class="status-indicator">●</span> Crafting estimate: <strong>3-5 days</strong>
+                        </div>
+                    </div>
+
+                    <!-- Visualizer Controls -->
+                    <div class="customizer-controls">
+                        <div class="control-section">
+                            <h4 class="control-section-title">1. Select Amigurumi Base</h4>
+                            <div class="base-options-grid">
+                                <button class="base-btn active" data-base="octopus">
+                                    <span class="base-icon">🐙</span>
+                                    <span class="base-label">Bubbles the Octo</span>
+                                </button>
+                                <button class="base-btn" data-base="beanie">
+                                    <span class="base-icon">👒</span>
+                                    <span class="base-label">Cozy Slouch Beanie</span>
+                                </button>
+                                <button class="base-btn" data-base="bee">
+                                    <span class="base-icon">🐝</span>
+                                    <span class="base-label">Bumble Plushie</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="control-section">
+                            <h4 class="control-section-title">2. Select Yarn Type & Texture</h4>
+                            <div class="yarn-type-grid">
+                                <button class="yarn-btn active" data-yarn="chenille" data-price="1899">
+                                    <span class="yarn-icon">🧶</span>
+                                    <div class="yarn-info">
+                                        <span class="yarn-name">Chenille Cloud</span>
+                                        <span class="yarn-desc">Super fluffy, velvet feel</span>
+                                    </div>
+                                </button>
+                                <button class="yarn-btn" data-yarn="cotton" data-price="1599">
+                                    <span class="yarn-icon">🧵</span>
+                                    <div class="yarn-info">
+                                        <span class="yarn-name">Premium Cotton</span>
+                                        <span class="yarn-desc">Clean, defined stitches</span>
+                                    </div>
+                                </button>
+                                <button class="yarn-btn" data-yarn="boucle" data-price="2199">
+                                    <span class="yarn-icon">🐑</span>
+                                    <div class="yarn-info">
+                                        <span class="yarn-name">Bouclé Wool</span>
+                                        <span class="yarn-desc">Soft, curly, textured loops</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="control-section">
+                            <h4 class="control-section-title">3. Pick Primary Color</h4>
+                            <div class="color-picker-row" id="primary-colors">
+                                <!-- Colors injected by JS -->
+                            </div>
+                        </div>
+
+                        <div class="control-section" id="secondary-color-section">
+                            <h4 class="control-section-title">4. Pick Accent Color</h4>
+                            <div class="color-picker-row" id="secondary-colors">
+                                <!-- Colors injected by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Design Lab Customizer Personalization Upcharges -->
+                        <div class="control-section" id="customizer-personalization-section">
+                            <h4 class="control-section-title">5. Add Personalization Details</h4>
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label for="customizer-brief" style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; color: var(--color-primary);">Special Customization Instructions (+₹299)</label>
+                                <textarea id="customizer-brief" rows="3" placeholder="Tell us if you want any specific details (e.g., tiny bow tie, small hat, color patterns, custom eyes)..." style="width: 100%; padding: 12px; border-radius: var(--radius-md); border: 2px solid var(--color-bg-alt); font-size: 0.85rem; resize: vertical; font-family: var(--font-body);"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; color: var(--color-primary);">Reference / Inspiration Image (+₹499)</label>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <input type="file" id="customizer-image-file" accept="image/*" style="font-size: 0.85rem; font-family: var(--font-body);">
+                                    <div id="customizer-image-preview-container" style="display: none; position: relative; border-radius: var(--radius-md); overflow: hidden; border: 1.5px dashed var(--color-primary); background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(8px); padding: 8px; width: fit-content; max-width: 100%;">
+                                        <img id="customizer-image-preview" src="" alt="Uploaded reference" style="max-width: 120px; max-height: 120px; border-radius: var(--radius-sm); object-fit: cover;">
+                                        <button type="button" id="clear-customizer-image-btn" style="position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: var(--color-white); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; line-height: 1;">&times;</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="customizer-pricing-card">
+                            <div class="pricing-breakdown-details" style="width: 100%; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; font-size: 0.85rem; border-bottom: 1px dashed rgba(44, 37, 32, 0.1); padding-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; color: var(--color-text-light);">
+                                    <span>Yarn Base Cost</span>
+                                    <span id="customizer-base-cost">₹1,899</span>
+                                </div>
+                                <div id="customizer-brief-row" style="display: none; justify-content: space-between; color: var(--color-primary);">
+                                    <span>Personalization Surcharge</span>
+                                    <span>+₹299</span>
+                                </div>
+                                <div id="customizer-photo-row" style="display: none; justify-content: space-between; color: var(--color-primary);">
+                                    <span>Inspiration Surcharge</span>
+                                    <span>+₹499</span>
+                                </div>
+                            </div>
+                            <div class="pricing-details">
+                                <span class="pricing-label">Custom Creation Price</span>
+                                <span class="pricing-value" id="custom-price">₹1,899</span>
+                            </div>
+                            <button class="btn primary-btn add-custom-to-cart-btn" id="add-custom-to-cart-btn">
+                                <span>Add Custom Design to Basket</span>
+                                <span class="btn-arrow">→</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Our Story & Craftsmanship -->
+        <section class="story-section" id="story">
+            <div class="section-container">
+                <div class="story-grid">
+                    <div class="story-image-group">
+                        <img src="assets/artisan_crafting.png" alt="Crochet Artisan Hand-weaving Yarn" class="story-img-main" id="story-img">
+                        <div class="floating-craft-card">
+                            <div class="craft-stat">100%</div>
+                            <div class="craft-stat-label">Slow & Sustainably Sourced Cotton</div>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <span class="sub-heading">Artisan Craft</span>
+                        <h2 class="section-title">Made Loop by Loop, Heart to Heart</h2>
+                        <p class="story-text">What started as a relaxing evening ritual soon blossomed into a cozy creative sanctuary. We believe in slow crafting—a complete departure from mass manufacture. Every stitch, knot, and loop is formed by our small group of local artisans, giving each plushie, hat, and throw a unique soul and lifetime personality.</p>
+                        <p class="story-text">We source exclusively premium, hypoallergenic yarns—from soft plush organic chenille to premium combed wool—ensuring each creation feels like a warm hug that lasts generations.</p>
+                        
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <div class="feature-icon">🛡️</div>
+                                <div class="feature-details">
+                                    <h4 class="feature-name">Hypoallergenic & Child-Safe</h4>
+                                    <p class="feature-desc">Fitted with safe, secure safety eyes and organic non-toxic fill.</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">🌿</div>
+                                <div class="feature-details">
+                                    <h4 class="feature-name">100% Sustainable Sourcing</h4>
+                                    <p class="feature-desc">Ethically harvested plant fibers and biodegradable wool elements.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Custom Order Wizard / Form -->
+        <section class="custom-order-section" id="custom-order">
+            <div class="section-container">
+                <div class="custom-order-card">
+                    <div class="custom-order-header">
+                        <span class="sub-heading">Custom Commission</span>
+                        <h2 class="section-title">Request a Custom Commission</h2>
+                        <p class="section-desc">Got a dream design that isn't in our shop? A crochet lookalike of your pet, a custom wedding blanket, or a specific cardigan pattern? Fill out our wizard and get an instant cost estimation!</p>
+                    </div>
+
+                    <form class="wizard-form" id="custom-commission-form" onsubmit="event.preventDefault();">
+                        <div class="wizard-form-steps">
+                            <!-- Progress Bar -->
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="commission-progress" style="width: 33%"></div>
+                                <div class="progress-step-labels">
+                                    <span class="step-label active">1. Concept</span>
+                                    <span class="step-label">2. Details</span>
+                                    <span class="step-label">3. Estimate</span>
+                                </div>
+                            </div>
+
+                            <!-- Form Step 1: Concept -->
+                            <div class="commission-step active" id="commission-step-1">
+                                <h3 class="step-title">What would you like us to crochet?</h3>
+                                <div class="form-group">
+                                    <label for="commission-category">Select Category</label>
+                                    <select id="commission-category" required>
+                                        <option value="" disabled selected>Choose a category...</option>
+                                        <option value="plushie">Custom Plushie / Amigurumi (₹2,499+)</option>
+                                        <option value="apparel">Custom Apparel / Sweater / Cardigan (₹5,499+)</option>
+                                        <option value="home">Home Decor / Special Blanket (₹6,499+)</option>
+                                        <option value="other">Other Unique Handmade Idea (₹2,999+)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="commission-desc">Describe your design in detail</label>
+                                    <textarea id="commission-desc" rows="4" placeholder="Tell us about the colors, sizes, inspirations, or characters you want us to bring to life..." required></textarea>
+                                    <div class="char-counter"><span id="char-count">0</span> / 400 characters</div>
+                                </div>
+                                <div class="wizard-nav-buttons">
+                                    <span></span> <!-- Placeholder for layout alignment -->
+                                    <button type="button" class="btn primary-btn wizard-next" id="comm-to-step-2">Continue</button>
+                                </div>
+                            </div>
+
+                            <!-- Form Step 2: Specs -->
+                            <div class="commission-step" id="commission-step-2">
+                                <h3 class="step-title">Specify Colors & Details</h3>
+                                <div class="form-group">
+                                    <label for="commission-size">Approximate Target Size</label>
+                                    <div class="radio-group-container">
+                                        <label class="radio-label">
+                                            <input type="radio" name="comm-size" value="small" checked>
+                                            <div class="radio-custom-card">
+                                                <span class="radio-icon">🧸</span>
+                                                <span class="radio-title">Small (Pocket/Mini)</span>
+                                                <span class="radio-sub">Under 6 inches</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="comm-size" value="medium">
+                                            <div class="radio-custom-card">
+                                                <span class="radio-icon">🦖</span>
+                                                <span class="radio-title">Medium (Standard)</span>
+                                                <span class="radio-sub">6 - 12 inches</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="comm-size" value="large">
+                                            <div class="radio-custom-card">
+                                                <span class="radio-icon">🦄</span>
+                                                <span class="radio-title">Large (Giant/Jumbo)</span>
+                                                <span class="radio-sub">Over 12 inches</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="commission-yarn">Preferred Material Texture</label>
+                                    <select id="commission-yarn" required>
+                                        <option value="standard">Standard Cozy Acrylic Blend</option>
+                                        <option value="chenille">Fluffy Chenille (Velvet Plush)</option>
+                                        <option value="organic">100% Eco Organic Cotton</option>
+                                        <option value="merino">Ultra-Luxurious Merino Wool</option>
+                                    </select>
+                                </div>
+                                <div class="wizard-nav-buttons">
+                                    <button type="button" class="btn secondary-btn wizard-prev" id="comm-back-to-step-1">Back</button>
+                                    <button type="button" class="btn primary-btn wizard-next" id="comm-to-step-3">Calculate Estimate</button>
+                                </div>
+                            </div>
+
+                            <!-- Form Step 3: Cost Estimate & Submit -->
+                            <div class="commission-step" id="commission-step-3">
+                                <h3 class="step-title">Your Custom Craft Estimate</h3>
+                                <div class="estimate-showcase">
+                                    <div class="estimate-breakdown">
+                                        <div class="breakdown-item">
+                                            <span>Base Craft Type cost</span>
+                                            <span id="est-base-cost">₹0</span>
+                                        </div>
+                                        <div class="breakdown-item">
+                                            <span>Size adjustment multiplier</span>
+                                            <span id="est-size-cost">₹0</span>
+                                        </div>
+                                        <div class="breakdown-item">
+                                            <span>Premium Material surcharge</span>
+                                            <span id="est-material-cost">₹0</span>
+                                        </div>
+                                        <hr class="estimate-divider">
+                                        <div class="breakdown-item total-item">
+                                            <span>Estimated Craft Price</span>
+                                            <span class="estimate-total-val" id="est-total-cost">₹0</span>
+                                        </div>
+                                    </div>
+                                    <p class="estimate-disclaimer">⚠️ Note: This is an automated estimation based on average yarn and labor time. Final costs will be finalized during our direct follow-up email.</p>
+                                </div>
+
+                                <div class="form-row two-cols">
+                                    <div class="form-group">
+                                        <label for="comm-name">Your Full Name</label>
+                                        <input type="text" id="comm-name" placeholder="Alex Rivers" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="comm-email">Your Email Address</label>
+                                        <input type="email" id="comm-email" placeholder="alex@gmail.com" required>
+                                    </div>
+                                </div>
+
+                                <div class="wizard-nav-buttons">
+                                    <button type="button" class="btn secondary-btn wizard-prev" id="comm-back-to-step-2">Back</button>
+                                    <button type="submit" class="btn primary-btn" id="comm-submit-btn">Send Inquiry</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="inquiry-success-message" id="inquiry-success">
+                        <div class="inquiry-success-icon">💌</div>
+                        <h3>Inquiry Sent Successfully!</h3>
+                        <p>We have captured your dream crochet concept. Our team will review our current queue, yarn inventory, and get back to you at <strong id="inquiry-email-display">alex@gmail.com</strong> within 24 hours with a finalized quote and timeline!</p>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
+                            <button class="btn" id="whatsapp-inquiry-btn" style="background-color: #25D366; color: white; border: none; display: inline-flex; align-items: center; gap: 8px; justify-content: center; font-weight: 700; width: 100%;">💬 Discuss on WhatsApp Business</button>
+                            <button class="btn primary-btn" id="restart-inquiry-btn" style="width: 100%;">Start Another Request</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="testimonials-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="sub-heading">Happy Snugglers</span>
+                    <h2 class="section-title">Warmed by Customer Love</h2>
+                </div>
+
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <div class="stars">★★★★★</div>
+                        <p class="testimonial-text">"I ordered a customized amigurumi octopus for my baby shower. The chenille wool is unbelievably soft, and the attention to detail in the loop stitching is amazing. It has survived three wash cycles beautifully!"</p>
+                        <div class="customer-info">
+                            <span class="customer-avatar">🌸</span>
+                            <div>
+                                <h4 class="customer-name">Samantha K.</h4>
+                                <span class="customer-role">Verified Parent</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="stars">★★★★★</div>
+                        <p class="testimonial-text">"The Sage Garden Cardigan is the single best slow-fashion item I own. It drapes perfectly, feels extremely cozy, and I get compliments literally every time I wear it. Worth every single cent."</p>
+                        <div class="customer-info">
+                            <span class="customer-avatar">🧣</span>
+                            <div>
+                                <h4 class="customer-name">Arlo M.</h4>
+                                <span class="customer-role">Slow Fashion Advocate</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modern Accordion FAQs -->
+        <section class="faqs-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="sub-heading">Got Questions?</span>
+                    <h2 class="section-title">Frequently Knitted Answers</h2>
+                </div>
+                <div class="faq-accordion-container">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How do I clean and wash my crochet creations?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>We recommend hand-washing all crochet items with a gentle baby soap in cold water, then laying them flat on a towel to air dry. Do not tumble dry, twist, or hang as this can stretch out the delicate stitch fibers.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Are the safety eyes on plushies secure for toddlers?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes! We use industrial washer-backed plastic safety eyes which are tightly locked inside the plushie. However, for babies under 3 years old, we highly recommend custom embroidered yarn eyes instead. You can request this in our Custom Inquiry form at no extra cost!</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How long do custom orders and customized items take to ship?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Customizer creations typically take 3-5 business days to craft, while larger bespoke custom commissions (like blankets or sweaters) take 2-3 weeks depending on yarn complexity and our current queue. Shipping times depend on your region and are added on top of craft times.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Section -->
+        <section class="hero-section" id="hero">
+            <div class="hero-bg-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+            </div>
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">🧶 Handcrafted & Made to Last</div>
+                    <h1 class="hero-title">Cosy yarn creations,<br>woven with <span class="accent-text">pure love.</span></h1>
+                    <p class="hero-subtitle">Step into a whimsical world of premium crochet plushies, stylish slow-fashion cardigans, and heartwarming decor—hand-knitted loop-by-loop by passionate artisans.</p>
+                    <div class="hero-buttons">
+                        <a href="#shop" class="btn primary-btn">Explore Shop</a>
+                        <a href="#customizer" class="btn secondary-btn">Customize Plushie 🎨</a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-image-wrapper">
+                        <!-- Floating crochet assets -->
+                        <div class="floating-item float-item-1">🐝</div>
+                        <div class="floating-item float-item-2">🐙</div>
+                        <div class="floating-item float-item-3">🧶</div>
+                        <img src="assets/hero_showcase.png" alt="Exquisite Sodi Daara Crochet Plushies" class="hero-showcase-img" id="hero-img">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="logo">
+                    <span class="logo-icon">🧶</span>
+                    <span class="logo-text">Sodi Daara</span>
+                </div>
+                <p class="footer-tagline">Crafting whimsical coziness, one stitch at a time. Empowering independent artisans and promoting mindful, slow craftsmanship.</p>
+                <div class="social-links">
+                    <a href="#" class="social-icon" aria-label="Instagram">📸</a>
+                    <a href="#" class="social-icon" aria-label="Pinterest">📌</a>
+                    <a href="#" class="social-icon" aria-label="TikTok">🎵</a>
+                    <a href="#" class="social-icon" aria-label="Etsy">👜</a>
+                </div>
+            </div>
+            <div class="footer-links-grid">
+                <div class="footer-links-col">
+                    <h4 class="footer-col-title">Shop Collection</h4>
+                    <a href="#shop">All Plushies</a>
+                    <a href="#shop">Wearables & Sweaters</a>
+                    <a href="#shop">Home Throws & Decor</a>
+                    <a href="#customizer">Custom Design Lab</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4 class="footer-col-title">Artisan Story</h4>
+                    <a href="#story">Behind the Loops</a>
+                    <a href="#story">Eco Sourcing Integrity</a>
+                    <a href="#custom-order">Commission Policies</a>
+                    <a href="#">Join Our Knitting Collective</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4 class="footer-col-title">Help & Support</h4>
+                    <a href="#faqs">Care & Cleaning Guide</a>
+                    <a href="#faqs">Shipping & Returns</a>
+                    <a href="#" id="track-order-link">Track Handmade Order</a>
+                    <a href="#custom-order">Contact Cozy Care</a>
+                    <a href="admin.html" style="font-weight: 700; color: var(--color-primary);">Artisan Admin 🔒</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Sodi Daara. Handcrafted with 💖 and dedication. All rights reserved. <a href="admin.html" style="opacity: 0.3; text-decoration: none; color: inherit; margin-left: 10px;">Artisan Access 🔒</a></p>
+        </div>
+    </footer>
+
+    <!-- Customer Portal Modal Overlay -->
+    <div class="modal-overlay" id="customer-portal-modal-overlay">
+        <div class="checkout-modal" style="max-width: 440px; max-height: 90vh; overflow-y: auto;">
+            <button class="close-modal-btn" id="close-portal-modal-btn">&times;</button>
+            
+            <!-- Auth View (Unauthenticated) -->
+            <div id="portal-auth-view" class="customer-portal-wrapper">
+                <h3 class="customer-portal-title">Customer Portal</h3>
+                <div class="portal-tabs">
+                    <button class="portal-tab-btn active" id="tab-login-btn">Sign In</button>
+                    <button class="portal-tab-btn" id="tab-register-btn">Create Account</button>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="portal-login-form" class="auth-form-container" onsubmit="event.preventDefault();">
+                    <div class="auth-input-group">
+                        <label for="login-email">Email Address</label>
+                        <input type="email" id="login-email" required placeholder="jane.doe@example.com">
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn primary-btn" style="margin-top: 12px;">Sign In</button>
+                </form>
+                
+                <!-- Register Form -->
+                <form id="portal-register-form" class="auth-form-container" style="display: none;" onsubmit="event.preventDefault();">
+                    <div class="auth-input-group">
+                        <label for="register-name">Full Name</label>
+                        <input type="text" id="register-name" required placeholder="Jane Doe">
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="register-email">Email Address</label>
+                        <input type="email" id="register-email" required placeholder="jane.doe@example.com">
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="register-phone">Phone Number (10-Digit Mobile)</label>
+                        <input type="tel" id="register-phone" required placeholder="9876543210" pattern="[6-9][0-9]{9}">
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="register-address">Delivery Address</label>
+                        <input type="text" id="register-address" required placeholder="123 Yarn Street">
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="register-city">City</label>
+                        <input type="text" id="register-city" required placeholder="Crochet City">
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="register-zip">Zip Code</label>
+                        <input type="text" id="register-zip" required placeholder="12345">
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn primary-btn" style="margin-top: 12px;">Create Account</button>
+                </form>
+            </div>
+            
+            <!-- Profile View (Authenticated) -->
+            <div id="portal-profile-view" class="customer-portal-wrapper" style="display: none;">
+                <h3 class="customer-portal-title">Welcome Back</h3>
+                <div class="customer-profile-card">
+                    <div class="customer-profile-avatar" id="profile-avatar-char">👤</div>
+                    <div class="customer-profile-details">
+                        <span class="customer-profile-name" id="profile-display-name">Jane Doe</span>
+                        <span class="customer-profile-email" id="profile-display-email">jane.doe@example.com</span>
+                    </div>
+                </div>
+                
+                <!-- Order History -->
+                <div style="text-align: left; margin-top: 10px;">
+                    <h4 style="font-family: var(--font-body); font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; color: var(--color-text); display: flex; align-items: center; gap: 6px;">📦 Your Crochet Orders</h4>
+                    <div id="portal-orders-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; padding-right: 4px;">
+                        <!-- Populate recent orders dynamically with track buttons -->
+                    </div>
+                </div>
+                
+                <button id="portal-logout-btn" class="btn secondary-btn" style="margin-top: 12px; border-color: #d65e42; color: #d65e42;">Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loop Chat Assistant Chatbot Widget -->
+    <div class="loop-assistant-container" id="loop-assistant-container">
+        <!-- Floating Bouncing Bubble -->
+        <div class="loop-assistant-bubble" id="loop-assistant-bubble" aria-label="Open support chat">
+            💬
+            <div class="bubble-notif" id="loop-assistant-notif"></div>
+        </div>
+        
+        <!-- Chat Window -->
+        <div class="loop-assistant-window" id="loop-assistant-window">
+            <div class="loop-assistant-header">
+                <div class="loop-assistant-title">
+                    <span>🧶</span> Loop Care Bot
+                </div>
+                <button class="loop-assistant-close" id="loop-assistant-close-btn">&times;</button>
+            </div>
+            
+            <div class="loop-assistant-messages" id="loop-assistant-messages">
+                <div class="chat-bubble assistant">
+                    Hello there! 🧶 I am Loop Care, your snuggly crochet care bot. I can answer FAQs, give you advice on cleaning, or help you track an order in real time! How can I help you today?
+                </div>
+            </div>
+            
+            <!-- Quick Replies -->
+            <div class="loop-assistant-quick-replies" id="loop-assistant-replies">
+                <button class="quick-reply-btn" data-reply="track">📦 Track My Order</button>
+                <button class="quick-reply-btn" data-reply="clean">🧼 How to Clean Crochet</button>
+                <button class="quick-reply-btn" data-reply="custom">🎨 How Customizing Works</button>
+            </div>
+            
+            <!-- Chat Input Area -->
+            <div class="loop-assistant-input-area">
+                <input type="text" class="loop-assistant-input" id="loop-assistant-input-field" placeholder="Ask Loop Care anything...">
+                <button class="loop-assistant-send" id="loop-assistant-send-btn">➔</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div class="modal-overlay" id="otp-modal-overlay">
+        <div class="checkout-modal" style="max-width: 400px; padding: 24px; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 12px;">🔐</div>
+            <h3 class="modal-title" style="margin-bottom: 8px;">Verify Your Contact Details</h3>
+            <p style="font-size: 0.85rem; color: var(--color-text-light); margin-bottom: 20px; line-height: 1.5;">
+                We have simulated sending a **4-digit secure OTP verification code** to your email and mobile phone to ensure authenticity.
+            </p>
+            
+            <div style="background: rgba(245, 240, 235, 0.6); padding: 12px; border-radius: var(--radius-md); font-size: 0.8rem; color: var(--color-primary); font-weight: 700; margin-bottom: 20px; border: 1.5px dashed var(--color-primary);">
+                📱 Demo Verification Code: <span style="font-family: monospace; font-size: 1.05rem; letter-spacing: 2px;">1234</span>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+                <label for="otp-input" style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px;">Enter 4-Digit OTP</label>
+                <input type="text" id="otp-input" maxlength="4" placeholder="••••" style="text-align: center; font-size: 1.4rem; letter-spacing: 8px; font-weight: bold; width: 100%; max-width: 200px; margin: 0 auto; display: block; padding: 8px; border-radius: var(--radius-sm); border: 2px solid var(--color-bg-alt);">
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button type="button" class="btn" id="cancel-otp-btn" style="background: var(--color-bg-alt); color: var(--color-text); padding: 10px 20px; border-radius: var(--radius-md);">Cancel</button>
+                <button type="button" class="btn primary-btn" id="confirm-otp-btn" style="padding: 10px 20px; border-radius: var(--radius-md);">Verify & Register</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
